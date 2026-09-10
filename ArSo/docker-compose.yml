@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.3.0
+    container_name: segundum-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+  mongodb:
+    image: mongo:7.0
+    container_name: segundum-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: segundum-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  usuarios:
+    build:
+      context: ./usuarios
+    container_name: segundum-usuarios
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_HOST: 0.0.0.0
+      JDBC_URL: jdbc:mysql://mysql:3306/arso_usuarios?serverTimezone=CET&useSSL=false&allowPublicKeyRetrieval=true
+      JDBC_USER: root
+      JDBC_PASSWORD: root
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - mysql
+      - rabbitmq
+
+  productos:
+    build:
+      context: ./productos
+    container_name: segundum-productos
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/arso_productos?serverTimezone=CET&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - mysql
+      - rabbitmq
+
+  compraventas:
+    build:
+      context: ./compraventas
+    container_name: segundum-compraventas
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/compraventas
+      SPRING_RABBITMQ_HOST: rabbitmq
+      MICROSERVICIOS_PRODUCTOS_BASE_URL: http://productos:8081/
+      MICROSERVICIOS_USUARIOS_BASE_URL: http://usuarios:8080/api/
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - usuarios
+      - productos
+
+  pasarela:
+    build:
+      context: ./pasarela
+    container_name: segundum-pasarela
+    restart: on-failure
+    ports:
+      - "9000:9000"
+    environment:
+      USUARIOS_URL: http://usuarios:8080/api/
+      PRODUCTOS_URL: http://productos:8081/
+      COMPRAVENTAS_URL: http://compraventas:8082/
+      VALORACIONES_URL: http://valoraciones:8080/api/
+    depends_on:
+      - usuarios
+      - productos
+      - compraventas
+      - valoraciones
+
+  valoraciones:
+    build:
+      context: ./valoraciones
+    container_name: segundum-valoraciones
+    restart: on-failure
+    ports:
+      - "8083:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=segundum_valoraciones;User=root;Password=root;"
+      RabbitMQ__Uri: "amqp://guest:guest@rabbitmq:5672/"
+      Microservicios__Compraventas: "http://compraventas:8082/"
+      ASPNETCORE_URLS: "http://+:8080"
+    depends_on:
+      - mysql
+      - rabbitmq
+      - compraventas
+
+volumes:
+  mysql_data:
+  mongodb_data:

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/java/com/arso/productos/repository/ProductoRepository.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/com/arso/productos/repository/ProductoRepository.java" />
+              <option name="originalContent" value="package com.arso.productos.repository;&#10;&#10;import com.arso.productos.domain.EstadoProducto;&#10;import com.arso.productos.domain.Producto;&#10;import com.arso.repository.Repository;&#10;&#10;import java.util.List;&#10;&#10;public interface ProductoRepository extends Repository&lt;Producto, String&gt; {&#10;    Producto findById(String id);&#10;    List&lt;Producto&gt; findAll();&#10;    Producto save(Producto producto);&#10;    void deleteProducto(Producto producto);&#10;    List&lt;Producto&gt; findBy(String rutaCategoria, String description, EstadoProducto estado, Double maxPrice);&#10;    List&lt;Producto&gt; findHistorialMes(int mes, int anio);&#10;    List&lt;Producto&gt; findByVendedor(String idVendedor);&#10;}&#10;" />
+              <option name="updatedContent" value="package com.arso.productos.repository;&#10;&#10;import com.arso.productos.domain.EstadoProducto;&#10;import com.arso.productos.domain.Producto;&#10;import com.arso.repository.Repository;&#10;&#10;import java.util.List;&#10;&#10;public interface ProductoRepository extends Repository&lt;Producto, String&gt; {&#10;    Producto findById(String id);&#10;    List&lt;Producto&gt; findAll();&#10;    Producto save(Producto producto);&#10;    void deleteProducto(Producto producto);&#10;    List&lt;Producto&gt; findBy(String rutaCategoria, String description, EstadoProducto estado, Double maxPrice);&#10;    List&lt;Producto&gt; findHistorialMes(int mes, int anio);&#10;    List&lt;Producto&gt; findByVendedor(String idVendedor);&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

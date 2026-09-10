@@ -1,0 +1,117 @@
+{
+	"info": {
+		"name": "SegundUM - Defensa Valoraciones (Tarea 10)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Registrar Valoración como Comprador",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"idCompraventa\": \"ID_COMPRAVENTA_AQUI\",\n  \"idUsuarioRegistra\": \"ID_COMPRADOR_AQUI\",\n  \"puntuacion\": 5,\n  \"comentario\": \"Excelente vendedor, muy rápido.\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/valoraciones/vendedor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"valoraciones",
+						"vendedor"
+					]
+				}
+			}
+		},
+		{
+			"name": "2. Registrar Valoración como Vendedor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"idCompraventa\": \"ID_COMPRAVENTA_AQUI\",\n  \"idUsuarioRegistra\": \"ID_VENDEDOR_AQUI\",\n  \"puntuacion\": 4,\n  \"comentario\": \"Todo correcto, pago rápido.\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/valoraciones/comprador",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"valoraciones",
+						"comprador"
+					]
+				}
+			}
+		},
+		{
+			"name": "3. Consultar Valoraciones (con Paginación y HATEOAS)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/api/valoraciones/vendedor/ID_VENDEDOR_AQUI?page=1&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"valoraciones",
+						"vendedor",
+						"ID_VENDEDOR_AQUI"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "4. Comprobar Efecto del Evento RabbitMQ en Usuarios",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/usuarios/ID_VENDEDOR_AQUI",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"usuarios",
+						"ID_VENDEDOR_AQUI"
+					]
+				}
+			}
+		}
+	]
+}

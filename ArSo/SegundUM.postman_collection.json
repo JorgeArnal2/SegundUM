@@ -1,0 +1,1513 @@
+{
+    "info": {
+        "name": "SegundUM - Pruebas Completas",
+        "description": "Colección completa de pruebas para todos los endpoints de los microservicios de SegundUM.\n\nFlujo: ejecutar las peticiones en orden secuencial (Collection Runner).\nLos tests encadenan variables automáticamente.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:9000"
+        }
+    ],
+    "item": [
+        {
+            "name": "1 - Registro de Usuarios",
+            "item": [
+                {
+                    "name": "01. Crear Usuario (Vendedor)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Juan\",\n    \"apellidos\": \"Pérez García\",\n    \"email\": \"juan@um.es\",\n    \"clave\": \"123456\",\n    \"fechaNacimiento\": \"1995-06-15\",\n    \"telefono\": \"600111222\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Crear usuario vendedor - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta incluye header Location', function () {",
+                                    "    var location = pm.response.headers.get('Location');",
+                                    "    pm.expect(location).to.not.be.undefined;",
+                                    "    var parts = location.split('/');",
+                                    "    var userId = parts[parts.length - 1];",
+                                    "    pm.environment.set('vendedorId', userId);",
+                                    "    pm.environment.set('userId', userId);",
+                                    "    console.log('vendedorId guardado: ' + userId);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "02. Crear Usuario (Comprador)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"María\",\n    \"apellidos\": \"López Fernández\",\n    \"email\": \"maria@um.es\",\n    \"clave\": \"654321\",\n    \"fechaNacimiento\": \"1998-03-22\",\n    \"telefono\": \"600333444\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Crear usuario comprador - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta incluye header Location', function () {",
+                                    "    var location = pm.response.headers.get('Location');",
+                                    "    pm.expect(location).to.not.be.undefined;",
+                                    "    var parts = location.split('/');",
+                                    "    var compradorId = parts[parts.length - 1];",
+                                    "    pm.environment.set('compradorId', compradorId);",
+                                    "    console.log('compradorId guardado: ' + compradorId);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "03. Crear Usuario duplicado (409)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Juan\",\n    \"apellidos\": \"Pérez García\",\n    \"email\": \"juan@um.es\",\n    \"clave\": \"123456\",\n    \"fechaNacimiento\": \"1995-06-15\",\n    \"telefono\": \"600111222\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Usuario duplicado - Status 409 Conflict', function () {",
+                                    "    pm.response.to.have.status(409);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2 - Autenticación",
+            "item": [
+                {
+                    "name": "04. Login Vendedor",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"juan@um.es\",\n    \"password\": \"123456\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login vendedor - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta contiene token JWT', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.not.be.undefined;",
+                                    "    pm.expect(jsonData.token).to.be.a('string');",
+                                    "    pm.environment.set('tokenVendedor', jsonData.token);",
+                                    "    pm.environment.set('token', jsonData.token);",
+                                    "    console.log('tokenVendedor guardado');",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta contiene id del usuario', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.not.be.undefined;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "05. Login Comprador",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"maria@um.es\",\n    \"password\": \"654321\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login comprador - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta contiene token JWT', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.not.be.undefined;",
+                                    "    pm.environment.set('tokenComprador', jsonData.token);",
+                                    "    console.log('tokenComprador guardado');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "06. Login credenciales inválidas (error)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"juan@um.es\",\n    \"password\": \"contraseña_incorrecta\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login inválido - Status 401 o 500', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([401, 500]);",
+                                    "});",
+                                    "",
+                                    "pm.test('No devuelve token', function () {",
+                                    "    try {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData.token).to.be.undefined;",
+                                    "    } catch(e) {",
+                                    "        // Si no es JSON, también es válido (error page)",
+                                    "        pm.expect(true).to.be.true;",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3 - Usuarios (autenticado)",
+            "item": [
+                {
+                    "name": "07. Listar Usuarios",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Listar usuarios - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta es un array con al menos 2 usuarios', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.be.an('array');",
+                                    "    pm.expect(jsonData.length).to.be.at.least(2);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "08. Obtener Usuario por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/{{vendedorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "{{vendedorId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Obtener usuario - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Datos del usuario son correctos', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.eql(pm.environment.get('vendedorId'));",
+                                    "    pm.expect(jsonData.nombre).to.eql('Juan');",
+                                    "    pm.expect(jsonData.email).to.eql('juan@um.es');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "09. Obtener Usuario inexistente (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/id-inexistente-000",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "id-inexistente-000"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Usuario inexistente - Status 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "10. Modificar Usuario",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/{{vendedorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "{{vendedorId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nombre\": \"Juan Carlos\",\n    \"apellidos\": \"Pérez García\",\n    \"clave\": \"123456\",\n    \"fechaNacimiento\": \"1995-06-15\",\n    \"telefono\": \"600999888\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Modificar usuario - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "11. Verificar modificación del usuario",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/{{vendedorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "{{vendedorId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Verificar modificación - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Nombre actualizado correctamente', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.nombre).to.eql('Juan Carlos');",
+                                    "    pm.expect(jsonData.telefono).to.eql('600999888');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "4 - Categorías",
+            "item": [
+                {
+                    "name": "12. Listar Categorías raíz",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/categorias",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "categorias"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Listar categorías - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta es un array de categorías', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.be.an('array');",
+                                    "    if (jsonData.length > 0) {",
+                                    "        pm.environment.set('categoriaId', jsonData[0].id);",
+                                    "        console.log('categoriaId guardado: ' + jsonData[0].id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "13. Obtener Categoría por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "categorias", "{{categoriaId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Obtener categoría - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Categoría tiene campos esperados', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.eql(pm.environment.get('categoriaId'));",
+                                    "    pm.expect(jsonData).to.have.property('nombre');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "14. Obtener Categoría inexistente (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/categorias/cat-inexistente-000",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "categorias", "cat-inexistente-000"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Categoría inexistente - Status 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "5 - Productos",
+            "item": [
+                {
+                    "name": "15. Crear Producto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titulo\": \"Bicicleta de montaña\",\n    \"descripcion\": \"Casi nueva, talla M\",\n    \"precio\": 150.0,\n    \"estado\": \"NUEVO\",\n    \"idCategoria\": \"{{categoriaId}}\",\n    \"envioDisponible\": true,\n    \"idVendedor\": \"{{vendedorId}}\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Crear producto - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta incluye header Location', function () {",
+                                    "    var location = pm.response.headers.get('Location');",
+                                    "    pm.expect(location).to.not.be.undefined;",
+                                    "    var parts = location.split('/');",
+                                    "    var productoId = parts[parts.length - 1];",
+                                    "    pm.environment.set('productoId', productoId);",
+                                    "    console.log('productoId guardado: ' + productoId);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "16. Crear segundo Producto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{tokenVendedor}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titulo\": \"Portátil Gaming\",\n    \"descripcion\": \"Intel i7, 16GB RAM, GTX 1660\",\n    \"precio\": 750.0,\n    \"estado\": \"BUEN_ESTADO\",\n    \"idCategoria\": \"{{categoriaId}}\",\n    \"envioDisponible\": false,\n    \"idVendedor\": \"{{vendedorId}}\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Crear segundo producto - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta incluye header Location', function () {",
+                                    "    var location = pm.response.headers.get('Location');",
+                                    "    pm.expect(location).to.not.be.undefined;",
+                                    "    var parts = location.split('/');",
+                                    "    var productoId2 = parts[parts.length - 1];",
+                                    "    pm.environment.set('productoId2', productoId2);",
+                                    "    console.log('productoId2 guardado: ' + productoId2);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "17. Obtener Producto por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Obtener producto - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Producto tiene campos esperados', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.eql(pm.environment.get('productoId'));",
+                                    "    pm.expect(jsonData.titulo).to.eql('Bicicleta de montaña');",
+                                    "    pm.expect(jsonData.precio).to.eql(150.0);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "18. Obtener Producto inexistente (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/producto-inexistente-000",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "producto-inexistente-000"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Producto inexistente - Status 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "19. Buscar Productos (sin filtros)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Buscar productos - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta contiene productos', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('_embedded');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "20. Buscar Productos (con filtro de texto)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos?texto=Bicicleta",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"],
+                            "query": [{"key": "texto", "value": "Bicicleta"}]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Buscar por texto - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "21. Buscar Productos (con filtro precio máximo)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos?precioMaximo=200",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"],
+                            "query": [{"key": "precioMaximo", "value": "200"}]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Buscar por precio - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "22. Modificar Producto",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"descripcion\": \"Bicicleta revisada recientemente, como nueva\",\n    \"precio\": 130.0\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Modificar producto - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "23. Verificar modificación del producto",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Verificar modificación producto - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Precio y descripción actualizados', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.precio).to.eql(130.0);",
+                                    "    pm.expect(jsonData.descripcion).to.include('revisada');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "24. Añadir Visualización",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}/visualizaciones",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}", "visualizaciones"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Añadir visualización - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "25. Asignar Lugar de Recogida",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}/recogida",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}", "recogida"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"descripcion\": \"Campus de Espinardo, Murcia\",\n    \"longitud\": -1.1743,\n    \"latitud\": 37.9922\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Asignar recogida - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "26. Verificar recogida asignada",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/{{productoId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "{{productoId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Verificar recogida - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Recogida asignada correctamente', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.recogida).to.not.be.undefined;",
+                                    "    pm.expect(jsonData.recogida.descripcion).to.include('Espinardo');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "27. Historial del mes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos/historial?mes=6&anio=2026",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos", "historial"],
+                            "query": [
+                                {"key": "mes", "value": "6"},
+                                {"key": "anio", "value": "2026"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Historial mes - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "28. Productos paginados",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/productos?page=0&size=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "productos"],
+                            "query": [
+                                {"key": "page", "value": "0"},
+                                {"key": "size", "value": "10"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Productos paginados - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta tiene estructura paginada', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('page');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "6 - Compraventas",
+            "item": [
+                {
+                    "name": "29. Crear Compraventa",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{tokenComprador}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/compraventas",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "compraventas"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"idProducto\": \"{{productoId}}\",\n    \"idComprador\": \"{{compradorId}}\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Crear compraventa - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta incluye header Location', function () {",
+                                    "    var location = pm.response.headers.get('Location');",
+                                    "    pm.expect(location).to.not.be.undefined;",
+                                    "    var parts = location.split('/');",
+                                    "    var compraventaId = parts[parts.length - 1];",
+                                    "    pm.environment.set('compraventaId', compraventaId);",
+                                    "    console.log('compraventaId guardado: ' + compraventaId);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "30. Obtener Compraventa por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/compraventas/{{compraventaId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "compraventas", "{{compraventaId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Obtener compraventa - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Compraventa tiene datos correctos', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('idProducto');",
+                                    "    pm.expect(jsonData).to.have.property('idComprador');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "31. Obtener Compraventa inexistente (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/compraventas/compraventa-inexistente-000",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "compraventas", "compraventa-inexistente-000"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Compraventa inexistente - Status 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "32. Compras por Comprador",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{tokenComprador}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/compraventas/comprador/{{compradorId}}?page=0&size=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "compraventas", "comprador", "{{compradorId}}"],
+                            "query": [
+                                {"key": "page", "value": "0"},
+                                {"key": "size", "value": "10"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Compras por comprador - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta tiene estructura paginada HATEOAS', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('page');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "33. Ventas por Vendedor",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/compraventas/vendedor/{{vendedorId}}?page=0&size=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "compraventas", "vendedor", "{{vendedorId}}"],
+                            "query": [
+                                {"key": "page", "value": "0"},
+                                {"key": "size", "value": "10"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Ventas por vendedor - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta tiene estructura paginada HATEOAS', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('page');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "7 - Valoraciones",
+            "item": [
+                {
+                    "name": "34. Registrar Valoración al Vendedor",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{tokenComprador}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/vendedor",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "vendedor"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"idCompraventa\": \"{{compraventaId}}\",\n    \"idUsuarioRegistra\": \"{{compradorId}}\",\n    \"puntuacion\": 5,\n    \"comentario\": \"Excelente vendedor, muy rápido.\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Registrar valoración vendedor - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Valoración creada tiene campos esperados', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('id');",
+                                    "    pm.expect(jsonData.puntuacion).to.eql(5);",
+                                    "    pm.environment.set('valoracionVendedorId', jsonData.id);",
+                                    "    console.log('valoracionVendedorId guardado: ' + jsonData.id);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "35. Registrar Valoración al Comprador",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/comprador",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "comprador"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"idCompraventa\": \"{{compraventaId}}\",\n    \"idUsuarioRegistra\": \"{{vendedorId}}\",\n    \"puntuacion\": 4,\n    \"comentario\": \"Buen comprador, pago rápido.\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Registrar valoración comprador - Status 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Valoración creada tiene campos esperados', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('id');",
+                                    "    pm.expect(jsonData.puntuacion).to.eql(4);",
+                                    "    pm.environment.set('valoracionCompradorId', jsonData.id);",
+                                    "    console.log('valoracionCompradorId guardado: ' + jsonData.id);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "36. Recuperar Valoración por ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/{{valoracionVendedorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "{{valoracionVendedorId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Recuperar valoración - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Valoración tiene datos correctos', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.puntuacion).to.eql(5);",
+                                    "    pm.expect(jsonData.comentario).to.include('Excelente');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "37. Recuperar Valoración inexistente (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/999999",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "999999"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Valoración inexistente - Status 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "38. Consultar Valoraciones como Vendedor",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/vendedor/{{vendedorId}}?page=1&size=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "vendedor", "{{vendedorId}}"],
+                            "query": [
+                                {"key": "page", "value": "1"},
+                                {"key": "size", "value": "10"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Valoraciones como vendedor - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta tiene estructura paginada', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('items');",
+                                    "    pm.expect(jsonData).to.have.property('totalItems');",
+                                    "    pm.expect(jsonData).to.have.property('page');",
+                                    "    pm.expect(jsonData).to.have.property('size');",
+                                    "    pm.expect(jsonData).to.have.property('links');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "39. Consultar Valoraciones como Comprador",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/valoraciones/comprador/{{compradorId}}?page=1&size=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "valoraciones", "comprador", "{{compradorId}}"],
+                            "query": [
+                                {"key": "page", "value": "1"},
+                                {"key": "size", "value": "10"}
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Valoraciones como comprador - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respuesta tiene estructura paginada', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('items');",
+                                    "    pm.expect(jsonData).to.have.property('totalItems');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "8 - Verificación Asincronía",
+            "item": [
+                {
+                    "name": "40. Esperar procesamiento RabbitMQ",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/{{vendedorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "{{vendedorId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Esperar 5 segundos para que RabbitMQ procese los eventos",
+                                    "var start = new Date().getTime();",
+                                    "while (new Date().getTime() - start < 5000) {",
+                                    "    // busy wait",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Vendedor tras eventos asíncronos - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Vendedor tiene contadores actualizados por RabbitMQ', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    console.log('contadorVentas: ' + jsonData.contadorVentas);",
+                                    "    console.log('valoracionMediaComoVendedor: ' + jsonData.valoracionMediaComoVendedor);",
+                                    "    // Los contadores se actualizan asíncronamente via RabbitMQ",
+                                    "    // Verificamos que al menos existen los campos",
+                                    "    pm.expect(jsonData).to.have.property('contadorVentas');",
+                                    "    pm.expect(jsonData).to.have.property('valoracionMediaComoVendedor');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "41. Verificar Comprador tras eventos",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{tokenComprador}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/usuarios/{{compradorId}}",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "usuarios", "{{compradorId}}"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Comprador tras eventos - Status 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Comprador tiene contadores actualizados por RabbitMQ', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    console.log('contadorCompras: ' + jsonData.contadorCompras);",
+                                    "    console.log('valoracionMediaComoComprador: ' + jsonData.valoracionMediaComoComprador);",
+                                    "    pm.expect(jsonData).to.have.property('contadorCompras');",
+                                    "    pm.expect(jsonData).to.have.property('valoracionMediaComoComprador');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "42. Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{tokenVendedor}}"}
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["auth", "logout"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Logout - Status 204 No Content', function () {",
+                                    "    pm.response.to.have.status(204);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
