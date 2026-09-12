@@ -51,3 +51,79 @@ export async function getProductos(page = 0, size = 8): Promise<PaginaProductos>
     totalPages: data.page?.totalPages ?? (items.length > 0 ? 1 : 0),
   }
 }
+
+export async function getCategorias(): Promise<Categoria[]> {
+  const response = await fetch('/api/categorias')
+
+  if (!response.ok) {
+    throw new Error('No se pudieron cargar las categorías')
+  }
+
+  return response.json()
+}
+
+export type CrearProductoDatos = {
+  titulo: string
+  descripcion: string
+  precio: number
+  estado: string
+  idCategoria: string
+  envioDisponible: boolean
+  idVendedor: string
+}
+
+async function errorMessageDe(response: Response, fallback: string): Promise<string> {
+  try {
+    const data = await response.json()
+    if (typeof data.error === 'string' && data.error) return data.error
+  } catch {
+    // sin cuerpo JSON: se usa el mensaje genérico
+  }
+  return fallback
+}
+
+export async function createProducto(token: string, datos: CrearProductoDatos): Promise<string> {
+  const response = await fetch('/api/productos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(datos),
+  })
+
+  if (!response.ok) {
+    throw new Error(await errorMessageDe(response, 'No se pudo publicar el producto'))
+  }
+
+  const location = response.headers.get('Location') ?? ''
+  const id = location
+    .split('/')
+    .filter(Boolean)
+    .pop()
+
+  if (!id) {
+    throw new Error('No se pudo obtener el identificador del producto')
+  }
+
+  return id
+}
+
+export async function asignarRecogida(
+  token: string,
+  idProducto: string,
+  descripcion: string,
+): Promise<void> {
+  const response = await fetch(`/api/productos/${idProducto}/recogida`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ descripcion, longitud: 0, latitud: 0 }),
+  })
+
+  if (!response.ok) {
+    throw new Error(await errorMessageDe(response, 'No se pudo guardar el lugar de recogida'))
+  }
+}

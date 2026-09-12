@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { CrearProductoPage } from './pages/CrearProductoPage'
 import { AdminPage } from './pages/AdminPage'
 import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -23,6 +24,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <ProductsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/products/new"
+              element={
+                <ProtectedRoute>
+                  <CrearProductoPage />
                 </ProtectedRoute>
               }
             />
