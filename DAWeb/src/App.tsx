@@ -4,8 +4,10 @@ import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { AdminPage } from './pages/AdminPage'
 import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AdminRoute } from './components/AdminRoute'
 
 export default function App() {
   return (
@@ -22,6 +24,14 @@ export default function App() {
                 <ProtectedRoute>
                   <ProductsPage />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />

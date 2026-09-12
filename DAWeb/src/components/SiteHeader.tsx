@@ -3,6 +3,10 @@ import { useAuth } from '../contexts/AuthContext'
 
 export function SiteHeader() {
   const { isAuthenticated, user, logout } = useAuth()
+  const esAdmin = (user?.roles ?? []).some((r) => {
+    const rol = r.toUpperCase()
+    return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
+  })
 
   return (
     <header className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -35,6 +39,13 @@ export function SiteHeader() {
                 Productos
               </NavLink>
             </li>
+            {esAdmin && (
+              <li className="nav-item">
+                <NavLink to="/admin" className="nav-link">
+                  Admin
+                </NavLink>
+              </li>
+            )}
           </ul>
 
           <div className="d-flex align-items-center">

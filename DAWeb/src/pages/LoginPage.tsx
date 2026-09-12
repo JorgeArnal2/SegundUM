@@ -23,7 +23,11 @@ export function LoginPage() {
     setSubmitting(true)
     try {
       await auth.login(email, password)
-      navigate('/', { replace: true })
+      const esAdmin = (auth.user?.roles ?? []).some((r) => {
+        const rol = r.toUpperCase()
+        return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
+      })
+      navigate(esAdmin ? '/admin' : '/', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión')
     } finally {
