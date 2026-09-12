@@ -1,14 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { MainLayout } from './layouts/MainLayout'
-import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { CrearProductoPage } from './pages/CrearProductoPage'
+import { ListsPage } from './pages/ListsPage'
 import { AdminPage } from './pages/AdminPage'
-import { AuthProvider } from './contexts/AuthContext'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AdminRoute } from './components/AdminRoute'
+import { NonAdminRoute } from './components/NonAdminRoute'
+
+function esAdmin(roles: string[] | undefined): boolean {
+  return (roles ?? []).some((r) => {
+    const rol = r.toUpperCase()
+    return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
+  })
+}
+
+function DefaultRedirect() {
+  const { isAuthenticated, user } = useAuth()
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <Navigate to={esAdmin(user?.roles) ? '/admin' : '/products'} replace />
+}
 
 export default function App() {
   return (
@@ -16,23 +29,31 @@ export default function App() {
       <BrowserRouter>
         <MainLayout>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<DefaultRedirect />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
               path="/products"
               element={
-                <ProtectedRoute>
+                <NonAdminRoute>
                   <ProductsPage />
-                </ProtectedRoute>
+                </NonAdminRoute>
               }
             />
             <Route
               path="/products/new"
               element={
-                <ProtectedRoute>
+                <NonAdminRoute>
                   <CrearProductoPage />
-                </ProtectedRoute>
+                </NonAdminRoute>
+              }
+            />
+            <Route
+              path="/lists"
+              element={
+                <NonAdminRoute>
+                  <ListsPage />
+                </NonAdminRoute>
               }
             />
             <Route

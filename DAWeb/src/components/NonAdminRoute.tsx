@@ -9,9 +9,9 @@ function esAdmin(roles: string[] | undefined): boolean {
   })
 }
 
-export function AdminRoute({ children }: { children: ReactElement }) {
+export function NonAdminRoute({ children }: { children: ReactElement }) {
   const { isAuthenticated, user } = useAuth()
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (!esAdmin(user?.roles)) return <Navigate to="/products" replace />
+  if (esAdmin(user?.roles)) return <Navigate to="/admin" replace />
   return children
 }

@@ -27,7 +27,7 @@ export function LoginPage() {
         const rol = r.toUpperCase()
         return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
       })
-      navigate(esAdmin ? '/admin' : '/', { replace: true })
+      navigate(esAdmin ? '/admin' : '/products', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo iniciar sesión')
     } finally {

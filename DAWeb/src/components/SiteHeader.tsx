@@ -8,10 +8,12 @@ export function SiteHeader() {
     return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
   })
 
+  const inicioUrl = !isAuthenticated ? '/login' : esAdmin ? '/admin' : '/products'
+
   return (
     <header className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div className="container">
-        <Link to="/" className="navbar-brand fw-semibold">
+        <Link to={inicioUrl} className="navbar-brand fw-semibold">
           DAWeb Market
         </Link>
 
@@ -28,25 +30,35 @@ export function SiteHeader() {
         </button>
 
         <div className="collapse navbar-collapse" id="mainNav">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <NavLink to="/" className="nav-link">
-                Inicio
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/products" className="nav-link">
-                Productos
-              </NavLink>
-            </li>
-            {esAdmin && (
-              <li className="nav-item">
-                <NavLink to="/admin" className="nav-link">
-                  Admin
-                </NavLink>
-              </li>
-            )}
-          </ul>
+          {isAuthenticated && (
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              {esAdmin ? (
+                <li className="nav-item">
+                  <NavLink to="/admin" className="nav-link">
+                    Admin
+                  </NavLink>
+                </li>
+              ) : (
+                <>
+                  <li className="nav-item">
+                    <NavLink to="/products" className="nav-link">
+                      Productos
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/lists" className="nav-link">
+                      Listas
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/products/new" className="nav-link">
+                      Alta producto
+                    </NavLink>
+                  </li>
+                </>
+              )}
+            </ul>
+          )}
 
           <div className="d-flex align-items-center">
             {isAuthenticated ? (

@@ -1,17 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ProductCard } from '../components/ProductCard'
-import { useAuth } from '../contexts/AuthContext'
 import { getProductos, type Producto } from '../services/products'
 
 const PAGE_SIZE = 8
 
 export function ProductsPage() {
-  const { isAuthenticated, user } = useAuth()
-  const esAdmin = (user?.roles ?? []).some((r) => {
-    const rol = r.toUpperCase()
-    return rol === 'ADMINISTRADOR' || rol === 'ADMIN'
-  })
   const [productos, setProductos] = useState<Producto[]>([])
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -40,18 +33,11 @@ export function ProductsPage() {
 
   return (
     <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-start gap-2 mb-4">
-        <div>
-          <h2 className="h4 mb-1">Productos</h2>
-          <p className="text-secondary mb-0">
-            {totalElements} resultado{totalElements === 1 ? '' : 's'}
-          </p>
-        </div>
-        {isAuthenticated && !esAdmin && (
-          <Link to="/products/new" className="btn btn-primary btn-sm">
-            Publicar producto
-          </Link>
-        )}
+      <div className="mb-4">
+        <h2 className="h4 mb-1">Productos</h2>
+        <p className="text-secondary mb-0">
+          {totalElements} resultado{totalElements === 1 ? '' : 's'}
+        </p>
       </div>
 
       {error && (
