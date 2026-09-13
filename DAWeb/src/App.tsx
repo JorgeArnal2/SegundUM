@@ -3,6 +3,7 @@ import { MainLayout } from './layouts/MainLayout'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { ProductDetailPage } from './pages/ProductDetailPage'
 import { CrearProductoPage } from './pages/CrearProductoPage'
 import { ListsPage } from './pages/ListsPage'
 import { AdminPage } from './pages/AdminPage'
@@ -45,6 +46,14 @@ export default function App() {
               element={
                 <NonAdminRoute>
                   <CrearProductoPage />
+                </NonAdminRoute>
+              }
+            />
+            <Route
+              path="/products/:id"
+              element={
+                <NonAdminRoute>
+                  <ProductDetailPage />
                 </NonAdminRoute>
               }
             />

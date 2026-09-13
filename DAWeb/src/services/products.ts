@@ -62,6 +62,45 @@ export async function getCategorias(): Promise<Categoria[]> {
   return response.json()
 }
 
+export type ProductoDetalle = {
+  id: string
+  titulo: string
+  descripcion: string
+  precio: number
+  estado: string
+  fechaPublicacion: string
+  visualizaciones: number
+  envioDisponible: boolean
+  vendido: boolean
+  categoria: Categoria | null
+  vendedor: Vendedor | null
+  recogida: {
+    descripcion: string
+    longitud: number | null
+    latitud: number | null
+  } | null
+}
+
+export async function getProducto(id: string): Promise<ProductoDetalle> {
+  const response = await fetch(`/api/productos/${id}`)
+
+  if (!response.ok) {
+    throw new Error(await errorMessageDe(response, 'No se pudo cargar el producto'))
+  }
+
+  return response.json()
+}
+
+export async function registrarVisualizacion(id: string): Promise<void> {
+  const response = await fetch(`/api/productos/${id}/visualizaciones`, {
+    method: 'POST',
+  })
+
+  if (!response.ok) {
+    throw new Error('No se pudo registrar la visualización')
+  }
+}
+
 export type CrearProductoDatos = {
   titulo: string
   descripcion: string
