@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { crearCompraventa } from '../services/compraventas'
 import { getProducto, registrarVisualizacion, type ProductoDetalle } from '../services/products'
 
 const estadoEtiquetas: Record<string, string> = {
@@ -23,10 +25,30 @@ const fechaFormatter = new Intl.DateTimeFormat('es-ES', {
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const { token, user } = useAuth()
   const [producto, setProducto] = useState<ProductoDetalle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false)
+  const [comprando, setComprando] = useState(false)
+  const [errorCompra, setErrorCompra] = useState('')
+  const [compraRealizada, setCompraRealizada] = useState(false)
+
+  async function confirmarCompra() {
+    if (!producto) return
+    setComprando(true)
+    setErrorCompra('')
+    try {
+      await crearCompraventa(token ?? '', producto.id, user?.id ?? '')
+      setMostrarConfirmacion(false)
+      setCompraRealizada(true)
+      setProducto((prev) => (prev ? { ...prev, vendido: true } : prev))
+    } catch (err) {
+      setErrorCompra(err instanceof Error ? err.message : 'No se pudo completar la compra')
+    } finally {
+      setComprando(false)
+    }
+  }
 
   useEffect(() => {
     if (!id) return
@@ -70,6 +92,12 @@ return (
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}
+          </div>
+        )}
+
+        {compraRealizada && (
+          <div className="alert alert-success" role="alert">
+            Compra realizada correctamente.
           </div>
         )}
 
@@ -148,9 +176,9 @@ return (
                       </button>
                     )}
 
-                    <p className="text-secondary small text-center mb-0 mt-3">
-                      El proceso de compra estará disponible próximamente.
-                    </p>
+<p className="text-secondary small text-center mb-0 mt-3">
+                        Al comprar este producto se notificará al vendedor.
+                      </p>
                   </div>
                 </div>
               </div>
@@ -183,12 +211,18 @@ return (
                 />
               </div>
               <div className="modal-body">
-                ¿Seguro que quieres comprar este producto?
+                <p className="mb-0">¿Seguro que quieres comprar este producto?</p>
+                {errorCompra && (
+                  <div className="alert alert-danger mb-0 mt-3 py-2" role="alert">
+                    {errorCompra}
+                  </div>
+                )}
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
+                  disabled={comprando}
                   onClick={() => setMostrarConfirmacion(false)}
                 >
                   No
@@ -196,9 +230,10 @@ return (
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => setMostrarConfirmacion(false)}
+                  disabled={comprando}
+                  onClick={confirmarCompra}
                 >
-                  Sí, comprar
+                  {comprando ? 'Procesando…' : 'Sí, comprar'}
                 </button>
               </div>
             </div>
