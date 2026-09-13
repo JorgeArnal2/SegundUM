@@ -17,6 +17,15 @@ export type LoginCredentials = {
   password: string
 }
 
+export type RegisterPayload = {
+  nombre: string
+  apellidos: string
+  email: string
+  clave: string
+  fechaNacimiento: string
+  telefono: string
+}
+
 export async function loginRequest(credentials: LoginCredentials): Promise<AuthResponse> {
   const response = await fetch('/auth/login', {
     method: 'POST',
@@ -32,6 +41,30 @@ export async function loginRequest(credentials: LoginCredentials): Promise<AuthR
   }
 
   return response.json()
+}
+
+export async function registerRequest(payload: RegisterPayload): Promise<void> {
+  const response = await fetch('/api/usuarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    let message = 'No se pudo crear la cuenta. Inténtalo de nuevo.'
+    try {
+      const data = await response.json()
+      if (typeof data?.error === 'string' && data.error) {
+        message = data.error
+      }
+    } catch {
+      // cuerpo de error no es JSON
+    }
+    if (response.status === 409) {
+      message = 'Ya existe un usuario con ese email'
+    }
+    throw new Error(message)
+  }
 }
 
 export async function logoutRequest(): Promise<void> {

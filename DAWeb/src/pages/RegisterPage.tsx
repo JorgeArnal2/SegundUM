@@ -1,5 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { registerRequest } from '../services/auth'
 
 type RegisterFormState = {
   name: string
@@ -24,6 +25,9 @@ const today = new Date().toISOString().split('T')[0]
 export function RegisterPage() {
   const [form, setForm] = useState<RegisterFormState>(initialFormState)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const navigate = useNavigate()
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target
@@ -33,7 +37,7 @@ export function RegisterPage() {
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const formElement = event.currentTarget
@@ -42,8 +46,25 @@ export function RegisterPage() {
       return
     }
 
-    setSubmitted(true)
-    setForm(initialFormState)
+    setError('')
+    setSubmitting(true)
+    try {
+      await registerRequest({
+        nombre: form.name,
+        apellidos: form.surname,
+        email: form.email,
+        clave: form.password,
+        fechaNacimiento: form.birthDate,
+        telefono: form.phone,
+      })
+      setSubmitted(true)
+      setForm(initialFormState)
+      navigate('/login')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo crear la cuenta')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -56,7 +77,7 @@ export function RegisterPage() {
                 <div>
                   <h2 className="h4 mb-2">Crear cuenta</h2>
                   <p className="text-secondary mb-0">
-                    Formulario preparado con validación HTML5 y sin envío real al backend.
+                    Completa tus datos para crear tu cuenta en SegundUM.
                   </p>
                 </div>
                 <Link className="btn btn-outline-secondary btn-sm" to="/login">
@@ -66,7 +87,13 @@ export function RegisterPage() {
 
               {submitted && (
                 <div className="alert alert-success" role="status">
-                  Formulario preparado correctamente. No se ha enviado nada.
+                  Cuenta creada correctamente. Puedes iniciar sesión.
+                </div>
+              )}
+
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
                 </div>
               )}
 
@@ -87,6 +114,7 @@ export function RegisterPage() {
                       autoComplete="given-name"
                       placeholder="Tu nombre"
                       pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+"
+                      disabled={submitting}
                     />
                   </div>
 
@@ -105,6 +133,7 @@ export function RegisterPage() {
                       autoComplete="family-name"
                       placeholder="Tus apellidos"
                       pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+"
+                      disabled={submitting}
                     />
                   </div>
 
@@ -122,6 +151,7 @@ export function RegisterPage() {
                       required
                       autoComplete="email"
                       placeholder="tu@email.com"
+                      disabled={submitting}
                     />
                   </div>
 
@@ -140,6 +170,7 @@ export function RegisterPage() {
                       minLength={8}
                       autoComplete="new-password"
                       placeholder="Mínimo 8 caracteres"
+                      disabled={submitting}
                     />
                   </div>
 
@@ -157,6 +188,7 @@ export function RegisterPage() {
                       required
                       max={today}
                       min="1900-01-01"
+                      disabled={submitting}
                     />
                   </div>
 
@@ -178,13 +210,14 @@ export function RegisterPage() {
                       maxLength={12}
                       autoComplete="tel"
                       placeholder="Ej. 612345678"
+                      disabled={submitting}
                     />
                   </div>
                 </div>
 
                 <div className="d-flex flex-wrap gap-2 mt-4">
-                  <button className="btn btn-primary" type="submit">
-                    Crear cuenta
+                  <button className="btn btn-primary" type="submit" disabled={submitting}>
+                    {submitting ? 'Creando cuenta…' : 'Crear cuenta'}
                   </button>
                   <button
                     type="button"
@@ -192,7 +225,9 @@ export function RegisterPage() {
                     onClick={() => {
                       setForm(initialFormState)
                       setSubmitted(false)
+                      setError('')
                     }}
+                    disabled={submitting}
                   >
                     Limpiar
                   </button>
