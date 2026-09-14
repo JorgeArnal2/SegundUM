@@ -1,5 +1,6 @@
 package com.arso.compraventas.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,8 +19,8 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public MessageConverter rabbitMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public MessageConverter rabbitMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
     }
 
     @Bean

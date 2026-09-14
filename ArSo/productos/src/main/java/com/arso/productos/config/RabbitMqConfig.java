@@ -1,5 +1,6 @@
 package com.arso.productos.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -41,7 +42,7 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public MessageConverter rabbitMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public MessageConverter rabbitMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
     }
 }

@@ -34,6 +34,8 @@ export function ProductDetailPage() {
   const [errorCompra, setErrorCompra] = useState('')
   const [compraRealizada, setCompraRealizada] = useState(false)
 
+  const esPropio = user != null && producto != null && producto.vendedor?.id === user.id
+
   async function confirmarCompra() {
     if (!producto) return
     setComprando(true)
@@ -162,7 +164,11 @@ return (
                       {precioFormatter.format(producto.precio)}
                     </div>
 
-                    {producto.vendido ? (
+                    {esPropio ? (
+                      <button type="button" className="btn btn-outline-primary btn-lg w-100">
+                        Editar
+                      </button>
+                    ) : producto.vendido ? (
                       <button type="button" className="btn btn-secondary btn-lg w-100" disabled>
                         Vendido
                       </button>
@@ -177,7 +183,9 @@ return (
                     )}
 
 <p className="text-secondary small text-center mb-0 mt-3">
-                        Al comprar este producto se notificará al vendedor.
+                        {esPropio
+                          ? 'Puedes editar o eliminar este producto.'
+                          : 'Al comprar este producto se notificará al vendedor.'}
                       </p>
                   </div>
                 </div>

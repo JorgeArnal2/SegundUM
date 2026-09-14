@@ -44,6 +44,10 @@ public class ServicioCompraventasImpl implements ServicioCompraventas {
             throw new ErrorNegocioException("El producto ya ha sido vendido");
         }
 
+        if (repository.existsByIdProducto(idProducto)) {
+            throw new ErrorNegocioException("El producto ya ha sido comprado");
+        }
+
         String idVendedor = producto.getVendedor() != null
                 ? producto.getVendedor().getId()
                 : null;
