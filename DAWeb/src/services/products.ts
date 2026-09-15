@@ -33,8 +33,29 @@ export type PaginaProductos = {
   totalPages: number
 }
 
-export async function getProductos(page = 0, size = 8): Promise<PaginaProductos> {
-  const response = await fetch(`/api/productos?page=${page}&size=${size}`)
+export type FiltrosProducto = {
+  texto?: string
+  categoria?: string
+  estado?: string
+  precioMaximo?: number
+}
+
+export async function getProductos(
+  page = 0,
+  size = 8,
+  filtros: FiltrosProducto = {},
+): Promise<PaginaProductos> {
+  const parametros = new URLSearchParams({ page: String(page), size: String(size) })
+
+  const texto = filtros.texto?.trim()
+  if (texto) parametros.set('texto', texto)
+  if (filtros.categoria) parametros.set('categoria', filtros.categoria)
+  if (filtros.estado) parametros.set('estado', filtros.estado)
+  if (filtros.precioMaximo != null && filtros.precioMaximo > 0) {
+    parametros.set('precioMaximo', String(filtros.precioMaximo))
+  }
+
+  const response = await fetch(`/api/productos?${parametros.toString()}`)
 
   if (!response.ok) {
     throw new Error('No se pudieron cargar los productos')

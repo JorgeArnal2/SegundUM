@@ -28,7 +28,7 @@ export function ProductCard({ producto }: { producto: Producto }) {
       to={`/products/${producto.id}`}
       className="d-block h-100 text-decoration-none text-reset"
     >
-      <article className="card h-100 shadow-sm">
+      <article className={`card h-100 shadow-sm ${producto.vendido ? 'opacity-50' : ''}`}>
         <div className="card-body d-flex flex-column gap-2">
           <div className="d-flex justify-content-between align-items-start gap-2">
             <h3 className="h6 mb-0">{producto.titulo}</h3>
