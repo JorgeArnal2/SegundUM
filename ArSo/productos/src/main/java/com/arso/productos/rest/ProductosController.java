@@ -162,6 +162,26 @@ public class ProductosController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Productos publicados por un vendedor")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Listado paginado de productos"),
+        @ApiResponse(responseCode = "400", description = "Parámetros inválidos",
+                     content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    @GetMapping("/vendedor/{id}")
+    public ResponseEntity<PagedModel<EntityModel<ProductoDto>>> getProductosPorVendedor(
+            @Parameter(description = "Identificador del vendedor") @PathVariable("id") String idVendedor,
+            @Parameter(description = "Número de página (0-based)") @RequestParam(defaultValue = "0") @Min(0) int page,
+            @Parameter(description = "Tamaño de página") @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+
+        List<ProductoDto> productos = this.servicio.getProductosPorVendedor(idVendedor)
+                .stream()
+                .map(ProductoDto::fromEntity)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(toPagedModel(productos, page, size));
+    }
+
     @Operation(summary = "Historial de productos de un mes/año concreto")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Historial paginado"),

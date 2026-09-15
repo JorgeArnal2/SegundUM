@@ -61,15 +61,36 @@ export async function getProductos(
     throw new Error('No se pudieron cargar los productos')
   }
 
-  const data = await response.json()
-  const items: Producto[] = data._embedded?.productoDtoList ?? []
+  return parsearPagina(await response.json(), page, size)
+}
+
+export async function getProductosPorVendedor(
+  idVendedor: string,
+  page = 0,
+  size = 12,
+): Promise<PaginaProductos> {
+  const response = await fetch(`/api/productos/vendedor/${idVendedor}?page=${page}&size=${size}`)
+
+  if (!response.ok) {
+    throw new Error(await errorMessageDe(response, 'No se pudieron cargar los productos del vendedor'))
+  }
+
+  return parsearPagina(await response.json(), page, size)
+}
+
+function parsearPagina(data: unknown, page: number, size: number): PaginaProductos {
+  const pagina = data as {
+    _embedded?: { productoDtoList?: Producto[] }
+    page?: { number?: number; size?: number; totalElements?: number; totalPages?: number }
+  }
+  const items: Producto[] = pagina._embedded?.productoDtoList ?? []
 
   return {
     items,
-    page: data.page?.number ?? page,
-    size: data.page?.size ?? size,
-    totalElements: data.page?.totalElements ?? items.length,
-    totalPages: data.page?.totalPages ?? (items.length > 0 ? 1 : 0),
+    page: pagina.page?.number ?? page,
+    size: pagina.page?.size ?? size,
+    totalElements: pagina.page?.totalElements ?? items.length,
+    totalPages: pagina.page?.totalPages ?? (items.length > 0 ? 1 : 0),
   }
 }
 
