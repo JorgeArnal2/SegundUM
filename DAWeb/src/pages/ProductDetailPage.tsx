@@ -165,9 +165,12 @@ return (
                     </div>
 
                     {esPropio ? (
-                      <button type="button" className="btn btn-outline-primary btn-lg w-100">
+                      <Link
+                        to={`/products/${producto.id}/edit`}
+                        className="btn btn-outline-primary btn-lg w-100"
+                      >
                         Editar
-                      </button>
+                      </Link>
                     ) : producto.vendido ? (
                       <button type="button" className="btn btn-secondary btn-lg w-100" disabled>
                         Vendido
@@ -184,7 +187,7 @@ return (
 
 <p className="text-secondary small text-center mb-0 mt-3">
                         {esPropio
-                          ? 'Puedes editar o eliminar este producto.'
+                          ? 'Puedes editar este producto.'
                           : 'Al comprar este producto se notificará al vendedor.'}
                       </p>
                   </div>

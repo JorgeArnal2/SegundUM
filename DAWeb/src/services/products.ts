@@ -190,6 +190,30 @@ export async function createProducto(token: string, datos: CrearProductoDatos): 
   return id
 }
 
+export type ModificarProductoDatos = {
+  descripcion: string
+  precio: number
+}
+
+export async function modificarProducto(
+  token: string,
+  id: string,
+  datos: ModificarProductoDatos,
+): Promise<void> {
+  const response = await fetch(`/api/productos/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(datos),
+  })
+
+  if (!response.ok) {
+    throw new Error(await errorMessageDe(response, 'No se pudo modificar el producto'))
+  }
+}
+
 export async function asignarRecogida(
   token: string,
   idProducto: string,

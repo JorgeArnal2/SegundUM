@@ -5,6 +5,7 @@ import { RegisterPage } from './pages/RegisterPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
 import { CrearProductoPage } from './pages/CrearProductoPage'
+import { EditarProductoPage } from './pages/EditarProductoPage'
 import { ListsPage } from './pages/ListsPage'
 import { AdminPage } from './pages/AdminPage'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -54,6 +55,14 @@ export default function App() {
               element={
                 <NonAdminRoute>
                   <ProductDetailPage />
+                </NonAdminRoute>
+              }
+            />
+            <Route
+              path="/products/:id/edit"
+              element={
+                <NonAdminRoute>
+                  <EditarProductoPage />
                 </NonAdminRoute>
               }
             />
